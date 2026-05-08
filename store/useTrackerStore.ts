@@ -49,6 +49,7 @@ type TrackerState = {
   toggleTask: (taskId: string, currentStatus: boolean) => Promise<void>
   addTask: (checkpointId: string, title: string) => Promise<void>
   addPhase: (title: string) => Promise<void>
+  addCheckpoint: (phaseId: string, title: string) => Promise<void>
   updateNodePosition: (nodeId: string, position: { x: number, y: number }) => Promise<void>
   updatePhaseSize: (phaseId: string, dimensions: { width: number, height: number }) => Promise<void>
   

@@ -46,7 +46,7 @@ export function DeletableEdge({
             className="w-5 h-5 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-full flex items-center justify-center text-zinc-500 hover:text-red-500 hover:border-red-500 hover:bg-red-50 dark:hover:bg-red-950 transition-colors shadow-sm"
             onClick={() => {
               if (confirm("Delete this connection?")) {
-                if (data?.dbId) deleteConnection(data.dbId, id)
+                if (data?.dbId) deleteConnection(data.dbId as string, id)
               }
             }}
           >
