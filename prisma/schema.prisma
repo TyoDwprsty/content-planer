@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Phase {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id     String   @db.Uuid // Foreign key to Supabase auth.users
+  title       String
+  order_index Int
+  position_x  Float    @default(100)
+  position_y  Float    @default(100)
+  width       Float?   @default(400)
+  height      Float?   @default(600)
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+
+  checkpoints           Checkpoint[]
+  source_connections    Connection[] @relation("SourcePhase")
+  target_connections    Connection[] @relation("TargetPhase")
+
+  @@map("phases")
+}
+
+model Checkpoint {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  phase_id    String   @db.Uuid
+  title       String
+  order_index Int
+  position_x  Float    @default(50)
+  position_y  Float    @default(100)
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+
+  phase Phase @relation(fields: [phase_id], references: [id], onDelete: Cascade)
+  tasks Task[]
+
+  source_connections Connection[] @relation("SourceCheckpoint")
+  target_connections Connection[] @relation("TargetCheckpoint")
+
+  @@map("checkpoints")
+}
+
+model Task {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  checkpoint_id String   @db.Uuid
+  title         String
+  is_completed  Boolean  @default(false)
+  order_index   Int
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+
+  checkpoint Checkpoint @relation(fields: [checkpoint_id], references: [id], onDelete: Cascade)
+
+  @@map("tasks")
+}
+
+model Connection {
+  id                   String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id              String   @db.Uuid // Foreign key to Supabase auth.users
+  source_checkpoint_id String?  @db.Uuid
+  source_phase_id      String?  @db.Uuid
+  target_checkpoint_id String?  @db.Uuid
+  target_phase_id      String?  @db.Uuid
+  created_at           DateTime @default(now()) @db.Timestamptz(6)
+
+  source_checkpoint Checkpoint? @relation("SourceCheckpoint", fields: [source_checkpoint_id], references: [id], onDelete: Cascade)
+  source_phase      Phase?      @relation("SourcePhase", fields: [source_phase_id], references: [id], onDelete: Cascade)
+  target_checkpoint Checkpoint? @relation("TargetCheckpoint", fields: [target_checkpoint_id], references: [id], onDelete: Cascade)
+  target_phase      Phase?      @relation("TargetPhase", fields: [target_phase_id], references: [id], onDelete: Cascade)
+
+  @@map("connections")
+}
