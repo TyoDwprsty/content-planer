@@ -51,7 +51,7 @@ export function TaskItem({ id, title, isCompleted, onToggle }: TaskItemProps) {
       </div>
       <span 
         className={cn(
-          "text-sm font-medium transition-colors flex-1 pr-16 truncate",
+          "text-sm font-medium transition-colors flex-1 pr-10 break-words whitespace-pre-wrap",
           isCompleted 
             ? "text-zinc-400 dark:text-zinc-600 line-through" 
             : "text-zinc-700 dark:text-zinc-300"

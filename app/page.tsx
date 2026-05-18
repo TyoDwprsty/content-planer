@@ -11,6 +11,8 @@ import { Toaster } from "react-hot-toast"
 import { CheckpointNode } from "@/components/NodeTypes/CheckpointNode"
 import { PhaseNode } from "@/components/NodeTypes/PhaseNode"
 import { DeletableEdge } from "@/components/NodeTypes/DeletableEdge"
+import { AIPromptPanel } from "@/components/AIPromptPanel"
+import { CanvasSelector } from "@/components/CanvasSelector"
 import { Plus } from "lucide-react"
 
 export default function Home() {
@@ -62,6 +64,8 @@ export default function Home() {
       <Toaster position="top-center" />
       <ContentManager />
       <TopBar />
+      <CanvasSelector />
+      <AIPromptPanel />
       
       <div className="flex-1 w-full relative pt-16">
         <ReactFlowProvider>
@@ -97,7 +101,7 @@ export default function Home() {
         </ReactFlowProvider>
 
         {/* Floating Action Menu for Graph */}
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex items-center gap-4 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md px-6 py-3 rounded-full border border-zinc-200 dark:border-zinc-800 shadow-xl">
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex flex-col sm:flex-row items-center gap-2 sm:gap-4 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md px-4 sm:px-6 py-2 sm:py-3 rounded-2xl sm:rounded-full border border-zinc-200 dark:border-zinc-800 shadow-xl w-[90%] sm:w-auto">
           <button
             onClick={() => setIsAddPhaseModalOpen(true)}
             className="flex items-center gap-2 text-sm font-semibold text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"

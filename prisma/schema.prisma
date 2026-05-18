@@ -1,11 +1,30 @@
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
 }
 
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
+  schemas   = ["public", "auth"]
+}
+
+model users {
+  id String @id @db.Uuid
+  @@schema("auth")
+}
+
+model Canvas {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id     String   @db.Uuid // Foreign key to Supabase auth.users
+  title       String
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+
+  phases      Phase[]
+
+  @@map("canvases")
+  @@schema("public")
 }
 
 model Phase {
@@ -17,13 +36,17 @@ model Phase {
   position_y  Float    @default(100)
   width       Float?   @default(400)
   height      Float?   @default(600)
+  canvas_id   String?  @db.Uuid
+  layout_mode String   @default("grid-2")
   created_at  DateTime @default(now()) @db.Timestamptz(6)
 
+  canvas                Canvas?      @relation(fields: [canvas_id], references: [id], onDelete: Cascade)
   checkpoints           Checkpoint[]
   source_connections    Connection[] @relation("SourcePhase")
   target_connections    Connection[] @relation("TargetPhase")
 
   @@map("phases")
+  @@schema("public")
 }
 
 model Checkpoint {
@@ -42,6 +65,7 @@ model Checkpoint {
   target_connections Connection[] @relation("TargetCheckpoint")
 
   @@map("checkpoints")
+  @@schema("public")
 }
 
 model Task {
@@ -55,6 +79,7 @@ model Task {
   checkpoint Checkpoint @relation(fields: [checkpoint_id], references: [id], onDelete: Cascade)
 
   @@map("tasks")
+  @@schema("public")
 }
 
 model Connection {
@@ -72,4 +97,5 @@ model Connection {
   target_phase      Phase?      @relation("TargetPhase", fields: [target_phase_id], references: [id], onDelete: Cascade)
 
   @@map("connections")
+  @@schema("public")
 }

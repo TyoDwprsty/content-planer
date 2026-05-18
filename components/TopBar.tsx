@@ -6,6 +6,7 @@ import { useState, useEffect } from "react"
 import { logout } from "@/app/login/actions"
 import { createClient } from "@/utils/supabase/client"
 import { InputModal } from "@/components/InputModal"
+import { useTrackerStore } from "@/store/useTrackerStore"
 
 export function TopBar() {
   const { theme, setTheme, resolvedTheme } = useTheme()
@@ -14,6 +15,9 @@ export function TopBar() {
   const [userEmail, setUserEmail] = useState("")
   const [userName, setUserName] = useState("")
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false)
+  const [isCreateCanvasOpen, setIsCreateCanvasOpen] = useState(false)
+  
+  const { canvases, activeCanvasId, setActiveCanvas, createCanvas, clearCanvas } = useTrackerStore()
 
   useEffect(() => {
     setMounted(true)
@@ -104,6 +108,15 @@ export function TopBar() {
         title="Edit Profile"
         placeholder={userName || "Your Name"}
         submitLabel="Save Changes"
+      />
+      
+      <InputModal
+        isOpen={isCreateCanvasOpen}
+        onClose={() => setIsCreateCanvasOpen(false)}
+        onSubmit={createCanvas}
+        title="New Canvas"
+        placeholder="e.g. Frontend Roadmap"
+        submitLabel="Create"
       />
     </div>
   )

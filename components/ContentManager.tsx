@@ -23,7 +23,7 @@ export function ContentManager() {
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         onClick={() => setIsOpen(true)}
-        className="fixed right-8 top-1/2 -translate-y-1/2 z-50 p-4 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 rounded-full shadow-2xl hover:scale-105 transition-transform"
+        className="fixed right-4 sm:right-8 top-20 sm:top-1/2 sm:-translate-y-1/2 z-50 p-4 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 rounded-full shadow-2xl hover:scale-105 transition-transform"
       >
         <Database size={24} />
       </motion.button>
@@ -52,7 +52,7 @@ export function ContentManager() {
       dragMomentum={false}
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
-      className="fixed right-8 top-1/4 z-50 w-80 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col"
+      className="fixed right-4 sm:right-8 top-20 sm:top-1/4 z-50 w-[calc(100vw-32px)] sm:w-80 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col"
       style={{ maxHeight: isMinimized ? 'auto' : '60vh' }}
     >
       {/* Header / Drag Handle */}

@@ -38,78 +38,14 @@ cp .env.example .env.local
 ```
 Open [.env.local](file:///d:/Personal%20Tyo/Coding/content-planer/.env.local) and supply your actual **Supabase URL** and **Anon Key** from the Supabase Project Dashboard under *Project Settings -> API*.
 
-### 4. Supabase Database Schema Setup
-Go to your Supabase Project's **SQL Editor** and run the following script to create all necessary tables and configure RLS (Row Level Security) with access control policies:
+### 4. Supabase Database Schema Setup (via Prisma)
+This project uses **Prisma** to manage the database schema. To push the schema to your Supabase PostgreSQL database, simply run:
 
-```sql
--- Enable UUID extension if not enabled
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
--- Create phases table
-CREATE TABLE public.phases (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-    title TEXT NOT NULL,
-    order_index INTEGER NOT NULL,
-    position_x DOUBLE PRECISION NOT NULL DEFAULT 100,
-    position_y DOUBLE PRECISION NOT NULL DEFAULT 100,
-    width DOUBLE PRECISION DEFAULT 400,
-    height DOUBLE PRECISION DEFAULT 600,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
-);
-
--- Create checkpoints table
-CREATE TABLE public.checkpoints (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    phase_id UUID NOT NULL REFERENCES public.phases(id) ON DELETE CASCADE,
-    title TEXT NOT NULL,
-    order_index INTEGER NOT NULL,
-    position_x DOUBLE PRECISION NOT NULL DEFAULT 50,
-    position_y DOUBLE PRECISION NOT NULL DEFAULT 100,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
-);
-
--- Create tasks table
-CREATE TABLE public.tasks (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    checkpoint_id UUID NOT NULL REFERENCES public.checkpoints(id) ON DELETE CASCADE,
-    title TEXT NOT NULL,
-    is_completed BOOLEAN NOT NULL DEFAULT false,
-    order_index INTEGER NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
-);
-
--- Create connections table
-CREATE TABLE public.connections (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-    source_checkpoint_id UUID REFERENCES public.checkpoints(id) ON DELETE CASCADE,
-    source_phase_id UUID REFERENCES public.phases(id) ON DELETE CASCADE,
-    target_checkpoint_id UUID REFERENCES public.checkpoints(id) ON DELETE CASCADE,
-    target_phase_id UUID REFERENCES public.phases(id) ON DELETE CASCADE,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-    CONSTRAINT check_source CHECK (
-        (source_checkpoint_id IS NOT NULL AND source_phase_id IS NULL) OR
-        (source_checkpoint_id IS NULL AND source_phase_id IS NOT NULL)
-    ),
-    CONSTRAINT check_target CHECK (
-        (target_checkpoint_id IS NOT NULL AND target_phase_id IS NULL) OR
-        (target_checkpoint_id IS NULL AND target_phase_id IS NOT NULL)
-    )
-);
-
--- Enable Row Level Security (RLS)
-ALTER TABLE public.phases ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.checkpoints ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.tasks ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.connections ENABLE ROW LEVEL SECURITY;
-
--- Setup RLS Policies for authenticated users
-CREATE POLICY "Users can manage their own phases" ON public.phases FOR ALL TO authenticated USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Users can manage checkpoints in their phases" ON public.checkpoints FOR ALL TO authenticated USING (EXISTS (SELECT 1 FROM public.phases WHERE public.phases.id = public.checkpoints.phase_id AND public.phases.user_id = auth.uid())) WITH CHECK (EXISTS (SELECT 1 FROM public.phases WHERE public.phases.id = public.checkpoints.phase_id AND public.phases.user_id = auth.uid()));
-CREATE POLICY "Users can manage tasks in their checkpoints" ON public.tasks FOR ALL TO authenticated USING (EXISTS (SELECT 1 FROM public.checkpoints JOIN public.phases ON public.phases.id = public.checkpoints.phase_id WHERE public.checkpoints.id = public.tasks.checkpoint_id AND public.phases.user_id = auth.uid())) WITH CHECK (EXISTS (SELECT 1 FROM public.checkpoints JOIN public.phases ON public.phases.id = public.checkpoints.phase_id WHERE public.checkpoints.id = public.tasks.checkpoint_id AND public.phases.user_id = auth.uid()));
-CREATE POLICY "Users can manage their own connections" ON public.connections FOR ALL TO authenticated USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+```bash
+npx prisma db push
 ```
+
+*Note: The `prisma/schema.prisma` file is already configured with all required tables, relations, and defaults. The Supabase RLS policies should be managed through the Supabase Dashboard as Prisma does not handle RLS natively.*
 
 ### 5. Running the Application Locally
 Run the Next.js development server:

@@ -35,7 +35,7 @@ export function CheckpointNode({ data }: any) {
   }
 
   return (
-    <div className="w-80 flex-shrink-0 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-lg overflow-hidden flex flex-col h-[500px]">
+    <div className="w-80 flex-shrink-0 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-lg overflow-hidden flex flex-col min-h-[200px] h-auto">
       <Handle type="target" position={Position.Left} className="w-3 h-3 bg-zinc-400 dark:bg-zinc-600 border-2 border-white dark:border-zinc-900" />
       
       {/* Node Header (Blender style) */}
